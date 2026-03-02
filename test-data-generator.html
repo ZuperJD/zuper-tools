@@ -193,24 +193,6 @@
   .log-area .log-info { color: #90cdf4; }
   .log-area .log-url { color: #b794f4; }
 
-  .cors-notice {
-    background: #fffbeb;
-    border: 1px solid #f6e05e;
-    border-radius: 8px;
-    padding: 14px 16px;
-    margin-bottom: 20px;
-    font-size: 13px;
-    color: #744210;
-    line-height: 1.6;
-  }
-  .cors-notice strong { color: #975a16; }
-  .cors-notice code {
-    background: #fefcbf;
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-  }
 
   .coming-soon {
     text-align: center;
@@ -247,15 +229,6 @@
 
 <div class="container">
 
-  <!-- CORS Notice -->
-  <div class="cors-notice" id="corsNotice">
-    <strong>CORS Notice</strong> &mdash; If you opened this file directly (<code>file://</code>), API calls will likely fail due to browser CORS restrictions.<br><br>
-    <strong>Option A &mdash; Local server (recommended):</strong><br>
-    Run <code>python3 -m http.server 8080</code> in the folder containing this file, then open <code>http://localhost:8080/test-data-generator.html</code>.<br><br>
-    <strong>Option B &mdash; CORS proxy:</strong><br>
-    Enter a proxy base URL below (e.g. <code>http://localhost:3000/proxy?url=</code>). All API requests will be prefixed with that URL.<br><br>
-    <strong>Note:</strong> Even with localhost, Zendesk may still block requests from browser origins. A proxy is the most reliable approach for local development.
-  </div>
 
   <!-- Zendesk Tab -->
   <div class="tab-content active" id="tab-zendesk">
