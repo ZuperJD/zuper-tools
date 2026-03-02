@@ -483,8 +483,8 @@ async function testConnection() {
   setRunning(true);
   log('--- Testing connection ---', 'info');
   try {
-    await zendeskRequest('GET', '/api/v2/account/settings.json');
-    log('Connection successful!', 'ok');
+    const data = await zendeskRequest('GET', '/api/v2/users/me.json');
+    log(`Connection successful! Authenticated as: ${data.user.name} (${data.user.email})`, 'ok');
   } catch(e) {
     log('Connection failed: ' + e.message, 'err');
   } finally {
