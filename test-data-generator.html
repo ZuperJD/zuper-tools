@@ -441,19 +441,33 @@ async function zendeskRequest(method, path, body = null) {
 
   const sanitizedUrl = path;
   log(`${method} ${sanitizedUrl}`, 'url');
+  log(`Target: ${c.proxy ? '(via proxy) ' : ''}${c.subdomain}.zendesk.com`, 'info');
 
   const auth = btoa(`${c.email}/token:${c.token}`);
   const opts = {
     method,
+    mode: 'cors',
     headers: {
       'Authorization': 'Basic ' + auth,
-      'Content-Type': 'application/json',
       'Accept': 'application/json',
     },
   };
-  if (body) opts.body = JSON.stringify(body);
+  if (body) {
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  }
 
-  const resp = await fetch(url, opts);
+  let resp;
+  try {
+    resp = await fetch(url, opts);
+  } catch(e) {
+    log(`Network error: ${e.message}`, 'err');
+    log(`Full URL attempted: ${url.replace(/\/token:.*@/, '/token:***@')}`, 'warn');
+    counters.errors++;
+    updateSummary();
+    throw e;
+  }
+
   const text = await resp.text();
 
   let data;
