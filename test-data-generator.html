@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Data Generator</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    padding: 24px 32px 16px;
+  }
+  .header h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .header p { font-size: 13px; color: #a0aec0; margin-top: 4px; }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    background: #16213e;
+    padding: 0 32px;
+  }
+  .tab {
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #a0aec0;
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab:hover { color: #e2e8f0; }
+  .tab.active { color: #fff; border-bottom-color: #667eea; }
+
+  .container { max-width: 1100px; margin: 24px auto; padding: 0 24px; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    padding: 20px;
+  }
+  .card h2 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #1a1a2e;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h2 .dot {
+    width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+    background: #f7fafc;
+  }
+  input:focus { outline: none; border-color: #667eea; background: #fff; }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .slider-row input[type="range"] { flex: 1; accent-color: #667eea; }
+  .slider-val {
+    background: #667eea;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 12px;
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+  button.btn {
+    padding: 9px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  button.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-primary { background: #667eea; color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: #5a6fd6; }
+  .btn-secondary { background: #edf2f7; color: #4a5568; }
+  .btn-secondary:hover:not(:disabled) { background: #e2e8f0; }
+  .btn-success { background: #48bb78; color: #fff; }
+  .btn-success:hover:not(:disabled) { background: #38a169; }
+  .btn-danger { background: #fc8181; color: #fff; }
+  .btn-danger:hover:not(:disabled) { background: #f56565; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .summary-item {
+    background: #f7fafc;
+    border-radius: 6px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .summary-item .num {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a1a2e;
+  }
+  .summary-item .lbl {
+    font-size: 11px;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .summary-item.errors .num { color: #e53e3e; }
+
+  .log-area {
+    background: #1a1a2e;
+    color: #a0e8af;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 14px;
+    border-radius: 8px;
+    height: 340px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .log-area .log-ts { color: #4a5568; }
+  .log-area .log-ok { color: #68d391; }
+  .log-area .log-err { color: #fc8181; }
+  .log-area .log-warn { color: #f6e05e; }
+  .log-area .log-info { color: #90cdf4; }
+  .log-area .log-url { color: #b794f4; }
+
+  .cors-notice {
+    background: #fffbeb;
+    border: 1px solid #f6e05e;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #744210;
+    line-height: 1.6;
+  }
+  .cors-notice strong { color: #975a16; }
+  .cors-notice code {
+    background: #fefcbf;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  .coming-soon {
+    text-align: center;
+    padding: 80px 20px;
+    color: #a0aec0;
+  }
+  .coming-soon h2 { font-size: 24px; color: #4a5568; margin-bottom: 8px; }
+  .coming-soon p { font-size: 14px; }
+
+  .clear-row {
+    margin-top: 16px;
+    text-align: right;
+  }
+
+  .field-hint {
+    font-size: 11px;
+    color: #a0aec0;
+    margin-top: -8px;
+    margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Test Data Generator</h1>
+  <p>Create optional Zendesk ticket fields + generate sample tickets with test data.</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="zendesk">Zendesk</button>
+  <button class="tab" data-tab="zuper">Zuper</button>
+</div>
+
+<div class="container">
+
+  <!-- CORS Notice -->
+  <div class="cors-notice" id="corsNotice">
+    <strong>CORS Notice</strong> &mdash; If you opened this file directly (<code>file://</code>), API calls will likely fail due to browser CORS restrictions.<br><br>
+    <strong>Option A &mdash; Local server (recommended):</strong><br>
+    Run <code>python3 -m http.server 8080</code> in the folder containing this file, then open <code>http://localhost:8080/test-data-generator.html</code>.<br><br>
+    <strong>Option B &mdash; CORS proxy:</strong><br>
+    Enter a proxy base URL below (e.g. <code>http://localhost:3000/proxy?url=</code>). All API requests will be prefixed with that URL.<br><br>
+    <strong>Note:</strong> Even with localhost, Zendesk may still block requests from browser origins. A proxy is the most reliable approach for local development.
+  </div>
+
+  <!-- Zendesk Tab -->
+  <div class="tab-content active" id="tab-zendesk">
+    <div class="grid">
+
+      <!-- Left: Config -->
+      <div>
+        <div class="card">
+          <h2><span class="dot" style="background:#667eea"></span> Configuration</h2>
+
+          <label for="cfgSubdomain">Zendesk Subdomain</label>
+          <input type="text" id="cfgSubdomain" placeholder='acme (for acme.zendesk.com)'>
+
+          <label for="cfgEmail">Admin Email</label>
+          <input type="email" id="cfgEmail" placeholder='admin@acme.com'>
+
+          <label for="cfgToken">API Token</label>
+          <input type="password" id="cfgToken" placeholder='Zendesk API token'>
+
+          <label for="cfgProxy">Proxy Base URL <span style="font-weight:400;text-transform:none;">(optional)</span></label>
+          <input type="text" id="cfgProxy" placeholder='http://localhost:3000/proxy?url='>
+          <div class="field-hint">If set, requests go to &lt;proxy&gt;&lt;zendesk-url&gt;. Leave blank to call Zendesk directly.</div>
+
+          <label>Record Count</label>
+          <div class="slider-row">
+            <input type="range" id="cfgCount" min="1" max="10" value="3">
+            <span class="slider-val" id="cfgCountVal">3</span>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-success" id="btnTest" onclick="testConnection()">Test Connection</button>
+            <button class="btn btn-primary" id="btnFields" onclick="createFields()">Create Ticket Fields</button>
+            <button class="btn btn-primary" id="btnTickets" onclick="generateTickets()">Generate Test Tickets</button>
+          </div>
+
+          <div class="clear-row">
+            <button class="btn btn-danger btn-sm" onclick="clearStorage()">Clear Stored Config</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Output -->
+      <div>
+        <div class="card">
+          <h2><span class="dot" style="background:#48bb78"></span> Results</h2>
+          <div class="summary-grid">
+            <div class="summary-item"><div class="num" id="sumFields">0</div><div class="lbl">Fields Created</div></div>
+            <div class="summary-item"><div class="num" id="sumTickets">0</div><div class="lbl">Tickets Created</div></div>
+            <div class="summary-item"><div class="num" id="sumUsers">0</div><div class="lbl">Users Created</div></div>
+            <div class="summary-item errors"><div class="num" id="sumErrors">0</div><div class="lbl">Errors</div></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h2><span class="dot" style="background:#ecc94b"></span> Log</h2>
+          <div class="log-area" id="logArea">Waiting for action...\n</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Zuper Tab -->
+  <div class="tab-content" id="tab-zuper">
+    <div class="card">
+      <div class="coming-soon">
+        <h2>Zuper</h2>
+        <p>Coming soon &mdash; Zuper test data generation will be added in a future update.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===================================================================
+   State
+   =================================================================== */
+const STORAGE_PREFIX = 'tdg_';
+let counters = { fields: 0, tickets: 0, users: 0, errors: 0 };
+let storedFieldIds = {}; // { title: id }
+let running = false;
+
+/* ===================================================================
+   Config helpers
+   =================================================================== */
+function getConfig() {
+  return {
+    subdomain: document.getElementById('cfgSubdomain').value.trim(),
+    email:     document.getElementById('cfgEmail').value.trim(),
+    token:     document.getElementById('cfgToken').value.trim(),
+    proxy:     document.getElementById('cfgProxy').value.trim(),
+    count:     parseInt(document.getElementById('cfgCount').value, 10),
+  };
+}
+
+function saveConfig() {
+  const c = getConfig();
+  localStorage.setItem(STORAGE_PREFIX + 'subdomain', c.subdomain);
+  localStorage.setItem(STORAGE_PREFIX + 'email', c.email);
+  localStorage.setItem(STORAGE_PREFIX + 'token', c.token);
+  localStorage.setItem(STORAGE_PREFIX + 'proxy', c.proxy);
+  localStorage.setItem(STORAGE_PREFIX + 'count', c.count);
+}
+
+function loadConfig() {
+  const fields = { subdomain: 'cfgSubdomain', email: 'cfgEmail', token: 'cfgToken', proxy: 'cfgProxy', count: 'cfgCount' };
+  for (const [key, elId] of Object.entries(fields)) {
+    const val = localStorage.getItem(STORAGE_PREFIX + key);
+    if (val !== null) document.getElementById(elId).value = val;
+  }
+  document.getElementById('cfgCountVal').textContent = document.getElementById('cfgCount').value;
+
+  const ids = localStorage.getItem(STORAGE_PREFIX + 'fieldIds');
+  if (ids) {
+    try { storedFieldIds = JSON.parse(ids); } catch(e) {}
+  }
+}
+
+function clearStorage() {
+  const keys = ['subdomain', 'email', 'token', 'proxy', 'count', 'fieldIds'];
+  keys.forEach(k => localStorage.removeItem(STORAGE_PREFIX + k));
+  storedFieldIds = {};
+  log('Stored configuration cleared.', 'warn');
+}
+
+/* ===================================================================
+   Logging
+   =================================================================== */
+function log(msg, type = 'info') {
+  const area = document.getElementById('logArea');
+  const ts = new Date().toLocaleTimeString();
+  const cls = { info: 'log-info', ok: 'log-ok', err: 'log-err', warn: 'log-warn', url: 'log-url' }[type] || 'log-info';
+  const line = document.createElement('div');
+  line.innerHTML = `<span class="log-ts">[${ts}]</span> <span class="${cls}">${escHtml(msg)}</span>`;
+  area.appendChild(line);
+  area.scrollTop = area.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function updateSummary() {
+  document.getElementById('sumFields').textContent  = counters.fields;
+  document.getElementById('sumTickets').textContent = counters.tickets;
+  document.getElementById('sumUsers').textContent   = counters.users;
+  document.getElementById('sumErrors').textContent  = counters.errors;
+}
+
+function resetCounters() {
+  counters = { fields: 0, tickets: 0, users: 0, errors: 0 };
+  updateSummary();
+}
+
+/* ===================================================================
+   UI helpers
+   =================================================================== */
+function setRunning(state) {
+  running = state;
+  ['btnTest', 'btnFields', 'btnTickets'].forEach(id => {
+    const el = document.getElementById(id);
+    el.disabled = state;
+  });
+  if (state) {
+    document.getElementById('btnFields').innerHTML  = '<span class="spinner"></span> Working\u2026';
+    document.getElementById('btnTickets').innerHTML = '<span class="spinner"></span> Working\u2026';
+    document.getElementById('btnTest').innerHTML    = '<span class="spinner"></span> Testing\u2026';
+  } else {
+    document.getElementById('btnFields').textContent  = 'Create Ticket Fields';
+    document.getElementById('btnTickets').textContent = 'Generate Test Tickets';
+    document.getElementById('btnTest').textContent    = 'Test Connection';
+  }
+}
+
+function validateConfig() {
+  const c = getConfig();
+  if (!c.subdomain || !c.email || !c.token) {
+    log('Missing required config: subdomain, email, or token.', 'err');
+    return null;
+  }
+  saveConfig();
+  return c;
+}
+
+/* ===================================================================
+   Tab switching
+   =================================================================== */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* Slider live display */
+document.getElementById('cfgCount').addEventListener('input', e => {
+  document.getElementById('cfgCountVal').textContent = e.target.value;
+});
+
+/* ===================================================================
+   Zendesk API request wrapper
+   =================================================================== */
+async function zendeskRequest(method, path, body = null) {
+  const c = getConfig();
+  const base = `https://${c.subdomain}.zendesk.com`;
+  const targetUrl = base + path;
+  const url = c.proxy ? c.proxy + encodeURIComponent(targetUrl) : targetUrl;
+
+  const sanitizedUrl = path;
+  log(`${method} ${sanitizedUrl}`, 'url');
+
+  const auth = btoa(`${c.email}/token:${c.token}`);
+  const opts = {
+    method,
+    headers: {
+      'Authorization': 'Basic ' + auth,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  };
+  if (body) opts.body = JSON.stringify(body);
+
+  const resp = await fetch(url, opts);
+  const text = await resp.text();
+
+  let data;
+  try { data = JSON.parse(text); } catch(e) { data = { raw: text.substring(0, 500) }; }
+
+  if (!resp.ok) {
+    const snippet = text.substring(0, 300);
+    log(`HTTP ${resp.status}: ${snippet}`, 'err');
+    counters.errors++;
+    updateSummary();
+    throw new Error(`HTTP ${resp.status}`);
+  }
+
+  return data;
+}
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+/* ===================================================================
+   Test Connection
+   =================================================================== */
+async function testConnection() {
+  const c = validateConfig();
+  if (!c) return;
+  setRunning(true);
+  log('--- Testing connection ---', 'info');
+  try {
+    await zendeskRequest('GET', '/api/v2/account/settings.json');
+    log('Connection successful!', 'ok');
+  } catch(e) {
+    log('Connection failed: ' + e.message, 'err');
+  } finally {
+    setRunning(false);
+  }
+}
+
+/* ===================================================================
+   Ticket Field definitions
+   =================================================================== */
+const FIELD_DEFS = [
+  {
+    title: 'Zuper Assignees',
+    type: 'tagger',
+    custom_field_options: [
+      { name: 'Zuper Assignee 1', value: 'zuper_assignee_1' },
+      { name: 'Zuper Assignee 2', value: 'zuper_assignee_2' },
+      { name: 'Zuper Assignee 3', value: 'zuper_assignee_3' },
+    ],
+  },
+  { title: 'Zuper Start Date', type: 'date' },
+  { title: 'Zuper End Date', type: 'date' },
+  { title: 'Zuper Customer Signature', type: 'textarea' },
+  {
+    title: 'Zuper Ticket Closure Status',
+    type: 'tagger',
+    custom_field_options: [
+      { name: 'Open',        value: 'zuper_closure_open' },
+      { name: 'Scheduled',   value: 'zuper_closure_scheduled' },
+      { name: 'In Progress', value: 'zuper_closure_in_progress' },
+      { name: 'Completed',   value: 'zuper_closure_completed' },
+      { name: 'Canceled',    value: 'zuper_closure_canceled' },
+    ],
+  },
+];
+
+/* ===================================================================
+   Create Ticket Fields (idempotent)
+   =================================================================== */
+async function createFields() {
+  const c = validateConfig();
+  if (!c) return;
+  setRunning(true);
+  resetCounters();
+  log('=== Creating Zendesk Ticket Fields ===', 'info');
+
+  try {
+    // Fetch all existing fields
+    log('Fetching existing ticket fields...', 'info');
+    let existingFields = [];
+    let pageUrl = '/api/v2/ticket_fields.json?per_page=100';
+    while (pageUrl) {
+      const data = await zendeskRequest('GET', pageUrl);
+      existingFields = existingFields.concat(data.ticket_fields || []);
+      pageUrl = data.next_page
+        ? new URL(data.next_page).pathname + new URL(data.next_page).search
+        : null;
+    }
+    log(`Found ${existingFields.length} existing ticket fields.`, 'info');
+
+    const titleToId = {};
+    existingFields.forEach(f => { titleToId[f.title] = f.id; });
+
+    for (const def of FIELD_DEFS) {
+      if (titleToId[def.title]) {
+        const id = titleToId[def.title];
+        storedFieldIds[def.title] = id;
+        log(`"${def.title}" already exists (id: ${id}), skipping.`, 'warn');
+      } else {
+        log(`Creating field: "${def.title}"...`, 'info');
+        const payload = { ticket_field: { ...def } };
+        const result = await zendeskRequest('POST', '/api/v2/ticket_fields.json', payload);
+        const newId = result.ticket_field.id;
+        storedFieldIds[def.title] = newId;
+        counters.fields++;
+        updateSummary();
+        log(`Created "${def.title}" (id: ${newId})`, 'ok');
+        await sleep(300);
+      }
+    }
+
+    localStorage.setItem(STORAGE_PREFIX + 'fieldIds', JSON.stringify(storedFieldIds));
+    log('All ticket fields ensured. IDs stored in localStorage.', 'ok');
+  } catch(e) {
+    log('Field creation aborted: ' + e.message, 'err');
+  } finally {
+    setRunning(false);
+  }
+}
+
+/* ===================================================================
+   User helpers
+   =================================================================== */
+async function ensureEndUser(email, name) {
+  // Search first
+  try {
+    const search = await zendeskRequest('GET', `/api/v2/users/search.json?query=${encodeURIComponent(email)}`);
+    const users = search.users || [];
+    const match = users.find(u => u.email === email);
+    if (match) {
+      log(`Reusing existing user: ${email} (id: ${match.id})`, 'info');
+      return match.id;
+    }
+  } catch(e) {
+    log(`User search failed for ${email}, will try to create.`, 'warn');
+  }
+
+  // Create
+  const result = await zendeskRequest('POST', '/api/v2/users.json', {
+    user: { name, email, role: 'end-user', verified: true }
+  });
+  const id = result.user.id;
+  counters.users++;
+  updateSummary();
+  log(`Created end-user: ${name} (id: ${id})`, 'ok');
+  return id;
+}
+
+/* ===================================================================
+   Agent pool (best effort)
+   =================================================================== */
+async function getAgentPool() {
+  try {
+    const data = await zendeskRequest('GET', '/api/v2/users.json?role[]=agent&per_page=100');
+    const agents = (data.users || []).filter(u => u.role === 'agent' || u.role === 'admin');
+    if (agents.length > 0) {
+      log(`Found ${agents.length} agent(s) for assignment pool.`, 'ok');
+      return agents.map(a => a.id);
+    }
+  } catch(e) {
+    log('Could not fetch agents (permissions?). Tickets will be unassigned.', 'warn');
+  }
+  return [];
+}
+
+/* ===================================================================
+   Generate Test Tickets
+   =================================================================== */
+async function generateTickets() {
+  const c = validateConfig();
+  if (!c) return;
+  setRunning(true);
+  resetCounters();
+  log('=== Generating Test Tickets ===', 'info');
+
+  // Load field IDs
+  const ids = localStorage.getItem(STORAGE_PREFIX + 'fieldIds');
+  if (ids) {
+    try { storedFieldIds = JSON.parse(ids); } catch(e) {}
+  }
+  if (Object.keys(storedFieldIds).length === 0) {
+    log('No stored field IDs. Run "Create Ticket Fields" first.', 'err');
+    setRunning(false);
+    return;
+  }
+  log(`Loaded ${Object.keys(storedFieldIds).length} stored field IDs.`, 'info');
+
+  const n = c.count;
+  const now = Date.now();
+  const assigneeValues = ['zuper_assignee_1', 'zuper_assignee_2', 'zuper_assignee_3'];
+  const closureValues  = ['zuper_closure_open', 'zuper_closure_scheduled', 'zuper_closure_in_progress', 'zuper_closure_completed', 'zuper_closure_canceled'];
+
+  try {
+    // Best-effort agent pool
+    const agents = await getAgentPool();
+    await sleep(250);
+
+    for (let i = 1; i <= n; i++) {
+      log(`--- Ticket ${i} of ${n} ---`, 'info');
+
+      // Ensure requester
+      const email = `testuser+${now}+${i}@example.com`;
+      const name  = `Test User ${i}`;
+      let requesterId;
+      try {
+        requesterId = await ensureEndUser(email, name);
+        await sleep(300);
+      } catch(e) {
+        log(`Failed to ensure user for ticket ${i}: ${e.message}`, 'err');
+        continue;
+      }
+
+      // Date calculations
+      const today = new Date();
+      const start = new Date(today); start.setDate(today.getDate() + i);
+      const end   = new Date(today); end.setDate(today.getDate() + i + 3);
+      const fmt = d => d.toISOString().slice(0, 10);
+
+      const fakeJobId = 'JOB-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+      const customFields = [
+        { id: storedFieldIds['Zuper Assignees'],              value: assigneeValues[i % assigneeValues.length] },
+        { id: storedFieldIds['Zuper Start Date'],             value: fmt(start) },
+        { id: storedFieldIds['Zuper End Date'],               value: fmt(end) },
+        { id: storedFieldIds['Zuper Customer Signature'],     value: `SIGNED_BY_TEST_USER_${i}` },
+        { id: storedFieldIds['Zuper Ticket Closure Status'],  value: closureValues[i % closureValues.length] },
+      ].filter(f => f.id); // skip if any field ID missing
+
+      const ticket = {
+        ticket: {
+          subject: `Zuper Sync Test Ticket #${i}`,
+          comment: {
+            body: `This is a test ticket (#${i}) generated by the Test Data Generator.\n\nJob ID: ${fakeJobId}\nScheduled: ${fmt(start)} to ${fmt(end)}\nRequester: ${name} <${email}>\nGenerated at: ${new Date().toISOString()}\n\nThis ticket contains sample custom field data for Zuper integration testing.`
+          },
+          requester_id: requesterId,
+          custom_fields: customFields,
+        }
+      };
+
+      // Assign agent if available
+      if (agents.length > 0) {
+        ticket.ticket.assignee_id = agents[i % agents.length];
+      } else {
+        log('No agents available, skipping assignee_id.', 'warn');
+      }
+
+      try {
+        const result = await zendeskRequest('POST', '/api/v2/tickets.json', ticket);
+        const tid = result.ticket.id;
+        counters.tickets++;
+        updateSummary();
+        log(`Created ticket #${tid}: "Zuper Sync Test Ticket #${i}"`, 'ok');
+      } catch(e) {
+        log(`Failed to create ticket ${i}: ${e.message}`, 'err');
+      }
+
+      if (i < n) await sleep(350);
+    }
+
+    log(`=== Done. ${counters.tickets} ticket(s) created, ${counters.errors} error(s). ===`, counters.errors > 0 ? 'warn' : 'ok');
+  } catch(e) {
+    log('Ticket generation aborted: ' + e.message, 'err');
+  } finally {
+    setRunning(false);
+  }
+}
+
+/* ===================================================================
+   Init
+   =================================================================== */
+loadConfig();
+
+// Auto-save on input change
+['cfgSubdomain', 'cfgEmail', 'cfgToken', 'cfgProxy', 'cfgCount'].forEach(id => {
+  document.getElementById(id).addEventListener('change', saveConfig);
+});
+</script>
+</body>
+</html>
